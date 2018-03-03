@@ -1,0 +1,47 @@
+# Install all required packages.
+install.packages(c("ggplot2", "e1071", "caret", "quanteda", 
+                   "irlba", "randomForest"))
+
+# Load up the .CSV data and explore in RStudio.
+data.raw <- read.csv(file.choose(), stringsAsFactors = FALSE, fileEncoding = "UTF-16")
+View(data.raw)
+
+# Check data to see if there are missing values.
+length(which(!complete.cases(data.raw)))
+
+library(quanteda)
+help(package = "quanteda")
+
+
+# Tokenize the posts.
+data.tokens <- tokens(data.raw$Text, what = "word", 
+                       remove_numbers = TRUE, remove_punct = TRUE,
+                       remove_symbols = TRUE, remove_hyphens = TRUE)
+
+
+# Lower case the tokens.
+data.tokens <- tokens_tolower(data.tokens)
+
+
+# Use quanteda's built-in stopword list for English.
+# NOTE - You should always inspect stopword lists for applicability to
+#        your problem/domain.
+data.tokens <- tokens_select(data.tokens, stopwords(), 
+                              selection = "remove")
+
+
+# Perform stemming on the tokens.
+data.tokens <- tokens_wordstem(data.tokens, language = "english")
+
+# Create our first bag-of-words model.
+train.tokens.dfm <- dfm(train.tokens, tolower = FALSE)
+
+
+# Transform to a matrix and inspect.
+train.tokens.matrix <- as.matrix(train.tokens.dfm)
+View(train.tokens.matrix[1:20, 1:100])
+dim(train.tokens.matrix)
+
+
+# Investigate the effects of stemming.
+colnames(train.tokens.matrix)[1:50]
