@@ -1,0 +1,58 @@
+# The use of Term Frequency-Inverse Document Frequency (TF-IDF) is a 
+# powerful technique for enhancing the information/signal contained
+# within our document-frequency matrix. Specifically, the mathematics
+# behind TF-IDF accomplish the following goals:
+#    1 - The TF calculation accounts for the fact that longer 
+#        documents will have higher individual term counts. Applying
+#        TF normalizes all documents in the corpus to be length 
+#        independent.
+#    2 - The IDF calculation accounts for the frequency of term
+#        appearance in all documents in the corpus. The intuition 
+#        being that a term that appears in every document has no
+#        predictive power.
+#    3 - The multiplication of TF by IDF for each cell in the matrix
+#        allows for weighting of #1 and #2 for each cell in the matrix.
+# Credits: Data science dojo team.
+
+
+# Our function for calculating relative term frequency (TF)
+term.frequency <- function(row) {
+  row / sum(row)
+}
+
+# Our function for calculating inverse document frequency (IDF)
+inverse.doc.freq <- function(col) {
+  corpus.size <- length(col)
+  doc.count <- length(which(col > 0))
+  
+  log10(corpus.size / doc.count)
+}
+
+# Our function for calculating TF-IDF.
+tf.idf <- function(x, idf) {
+  x * idf
+}
+
+
+# First step, normalize all documents via TF.
+train.tokens.df <- apply(train.tokens.matrix, 1, term.frequency)
+dim(train.tokens.df)
+View(train.tokens.df[1:20, 1:100])
+
+
+# Second step, calculate the IDF vector that we will use - both
+# for training data and for test data!
+train.tokens.idf <- apply(train.tokens.matrix, 2, inverse.doc.freq)
+str(train.tokens.idf)
+
+
+# Lastly, calculate TF-IDF for our training corpus.
+train.tokens.tfidf <-  apply(train.tokens.df, 2, tf.idf, idf = train.tokens.idf)
+dim(train.tokens.tfidf)
+View(train.tokens.tfidf[1:25, 1:25])
+
+
+# Transpose the matrix
+train.tokens.tfidf <- t(train.tokens.tfidf)
+dim(train.tokens.tfidf)
+View(train.tokens.tfidf[1:25, 1:25])
