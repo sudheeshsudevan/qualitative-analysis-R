@@ -87,3 +87,36 @@ View(data.tokens.tfidf[1:25, 1:25])
 data.tokens.tfidf <- t(data.tokens.tfidf)
 dim(data.tokens.tfidf)
 View(data.tokens.tfidf[1:25, 1:25])
+
+#Load Topic models
+install.packages("topicmodels")
+library(topicmodels)
+#Run Latent Dirichlet Allocation (LDA) using Gibbs Sampling
+#set burn in
+burnin <-1000
+#set iterations
+iter<-2000
+#thin the spaces between samples
+thin <- 500
+#set random starts at 5
+nstart <-5
+#use random integers as seed 
+seed <- list(254672,109,122887,145629037,2)
+# return the highest probability as the result
+best <-TRUE
+#set number of topics 
+k <-5
+#run the LDA model
+data.lda <- LDA(data.tokens.tfidf,k, method="Gibbs", 
+                control= list(nstart=nstart, seed = seed, best=best, burnin = burnin, iter = iter, thin=thin))
+
+top.words <- top.topic.words(ldaModel$topics, 5, by.score=TRUE)
+
+terms(data.lda, 15)
+################################################
+control_LDA_Gibbs <- list(alpha = 50/k, estimate.beta = T, verbose = 0, prefix = tempfile(), save = 0, 
+keep = 50, seed = 980,  for reproducibility nstart = 1, best = T,delta = 0.1,iter = 2000,burnin = 100,thin = 2000) 
+
+data.lda2 <- LDA(data.tokens.tfidf, k, method = "Gibbs", control = control_LDA_Gibbs)
+
+many_models <- mclapply(seq(2, 35, by = 1), function(x) {LDA(Blog_DTM, x, method = "Gibbs", control = control_LDA_Gibbs)} )
