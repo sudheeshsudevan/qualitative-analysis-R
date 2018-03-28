@@ -1,0 +1,89 @@
+# Install all required packages.
+install.packages(c("ggplot2", "e1071", "caret", "quanteda", 
+                   "irlba", "randomForest"))
+
+# Load up the .CSV data and explore in RStudio.
+data.raw <- read.csv(file.choose(), stringsAsFactors = FALSE)
+View(data.raw)
+
+# Check data to see if there are missing values.
+length(which(!complete.cases(data.raw)))
+
+library(quanteda)
+help(package = "quanteda")
+
+
+# Tokenize the posts.
+data.tokens <- tokens(data.raw$Text, what = "word", 
+                      remove_numbers = TRUE, remove_punct = TRUE,
+                      remove_symbols = TRUE, remove_hyphens = TRUE)
+
+
+# Lower case the tokens.
+data.tokens <- tokens_tolower(data.tokens)
+
+
+# Use quanteda's built-in stopword list for English.
+# NOTE - You should always inspect stopword lists for applicability to
+#        your problem/domain.
+data.tokens <- tokens_select(data.tokens, stopwords(), 
+                             selection = "remove")
+
+
+# Perform stemming on the tokens.
+data.tokens <- tokens_wordstem(data.tokens, language = "english")
+
+# Create our first bag-of-words model.
+data.tokens.dfm <- dfm(data.tokens, tolower = FALSE)
+
+
+# Transform to a matrix and inspect.
+data.tokens.matrix <- as.matrix(data.tokens.dfm)
+View(data.tokens.matrix[1:20, 1:100])
+dim(data.tokens.matrix)
+
+
+# Investigate the effects of stemming.
+colnames(data.tokens.matrix)[1:50]
+
+# Our function for calculating relative term frequency (TF)
+term.frequency <- function(row) {
+  row / sum(row)
+}
+
+# Our function for calculating inverse document frequency (IDF)
+inverse.doc.freq <- function(col) {
+  corpus.size <- length(col)
+  doc.count <- length(which(col > 0))
+  
+  log10(corpus.size / doc.count)
+}
+
+# Our function for calculating TF-IDF.
+tf.idf <- function(x, idf) {
+  x * idf
+}
+
+
+# First step, normalize all documents via TF.
+data.tokens.df <- apply(data.tokens.matrix, 1, term.frequency)
+dim(data.tokens.df)
+View(data.tokens.df[1:20, 1:100])
+
+
+# Second step, calculate the IDF vector that we will use - both
+# for training data and for test data!
+data.tokens.idf <- apply(data.tokens.matrix, 2, inverse.doc.freq)
+str(data.tokens.idf)
+
+
+# Lastly, calculate TF-IDF for our training corpus.
+data.tokens.tfidf <-  apply(data.tokens.df, 2, tf.idf, idf = data.tokens.idf)
+dim(data.tokens.tfidf)
+View(data.tokens.tfidf[1:25, 1:25])
+
+
+# Transpose the matrix
+data.tokens.tfidf <- t(data.tokens.tfidf)
+dim(data.tokens.tfidf)
+View(data.tokens.tfidf[1:25, 1:25])
