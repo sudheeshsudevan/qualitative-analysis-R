@@ -1,0 +1,22 @@
+##This code is not working yet. Gets an error while authenticating.
+##possible solutions: firewall restrictions.
+
+install.packages("twitteR")
+install.packages("knitr")
+install.packages('base64enc')
+library(twitteR)
+library(knitr)
+consumer_key <- "Dg4qcNMfxabXrxvFaHMEzvPUz"
+consumer_secret <- "2rpHILviDjZ81lvbKseYyAbwsMqVgXkbmRh779QBheAbHChcUo"
+access_token <- "324931263-rEzXuKDAFhLhGjrIP6UeQVgIoeUSp5380dusovCb"
+access_secret <- "uZn8jNDs9t4kmnTuseDEBRYNeai6PvDlDEzX2HUptSYJ8"
+
+setup_twitter_oauth(consumer_key, consumer_secret, access_token, access_secret)
+
+install.packages("openssl")
+install.packages("httpuv")
+install.packages("base64enc")
+library("openssl")
+library("httpuv")
+library ("httr")
+library(base64enc)
