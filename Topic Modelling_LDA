@@ -16,7 +16,7 @@ help(package = "quanteda")
 # Tokenize the posts.
 data.tokens <- tokens(data.raw$Text, what = "word", 
                       remove_numbers = TRUE, remove_punct = TRUE,
-                      remove_symbols = TRUE, remove_hyphens = TRUE)
+                      remove_symbols = TRUE, remove_hyphens = TRUE, remove_twitter = T, remove_url = T)
 
 
 # Lower case the tokens.
@@ -82,6 +82,10 @@ data.tokens.tfidf <-  apply(data.tokens.df, 2, tf.idf, idf = data.tokens.idf)
 dim(data.tokens.tfidf)
 View(data.tokens.tfidf[1:25, 1:25])
 
+################################################################
+#LDA function is not accepting the TF-IDF matrix because it contains non-integers. Have to figure out a work around for the same. 
+#Meantime, LDA can be run on the term-frequency matrix. It works!
+##################################################################
 
 # Transpose the matrix
 data.tokens.tfidf <- t(data.tokens.tfidf)
