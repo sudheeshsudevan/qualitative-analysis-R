@@ -1,0 +1,14 @@
+##Lemmatization is the process of comverting a word into its root or lemma form.
+## Package used is 'textstem'
+
+install.packages("textstem")
+library(textstem)
+?textstem
+
+raw_data <- lemmatize_strings(raw_data)
+##default dictionary is lexicon::hash_lemmas 
+
+##For large datasets, using dply:
+
+library(dplyr)
+raw_data %>% lemmatize_strings() %>% head()
